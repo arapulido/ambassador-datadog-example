@@ -1,0 +1,16 @@
+---
+apiVersion: getambassador.io/v2
+kind: Host
+metadata:
+  name: wildstar
+  namespace: ambassador
+spec:
+  hostname: "*"
+  selector:
+    matchLabels:
+      hostname: wildcard
+  acmeProvider:
+    authority: none
+  requestPolicy:
+    insecure:
+      action: Route

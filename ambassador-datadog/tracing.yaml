@@ -1,0 +1,10 @@
+---
+apiVersion: getambassador.io/v2
+kind: TracingService
+metadata:
+  name: tracing
+spec:
+  service: "${HOST_IP}:8126"
+  driver: datadog
+  config:
+    service_name: ambassador
