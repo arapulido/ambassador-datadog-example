@@ -48,7 +48,7 @@ spec:
         #   value: <your_client_token>
         # - name: DD_APPLICATION_ID
         #   value: <your_application_id>
-        image: ddtraining/ecommerce-frontend-broken:latest
+        image: ddtraining/ecommerce-frontend:latest 
         imagePullPolicy: Always
         name: ecommerce-spree-observability
         ports:
