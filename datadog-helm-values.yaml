@@ -315,7 +315,7 @@ datadog:
   ## Path to the container runtime socket (if different from Docker)
   ## This is supported starting from agent 6.6.0
   #
-  criSocketPath:  # /var/run/containerd/containerd.sock
+  criSocketPath: /var/run/crio/crio.sock
 
   ## @param processAgent - object - required
   ## Enable process agent and provide custom configs
