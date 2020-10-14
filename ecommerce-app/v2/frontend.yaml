@@ -4,6 +4,9 @@ metadata:
   labels:
     service: frontend
     app: ecommerce
+    tags.datadoghq.com/env: "ruby-shop"
+    tags.datadoghq.com/service: "store-frontend"
+    tags.datadoghq.com/version: "v2"
   name: frontend
 spec:
   replicas: 1
@@ -21,6 +24,9 @@ spec:
       labels:
         service: frontend
         app: ecommerce
+        tags.datadoghq.com/env: "ruby-shop"
+        tags.datadoghq.com/service: "store-frontend"
+        tags.datadoghq.com/version: "v2"
     spec:
       containers:
       - args:
@@ -43,12 +49,24 @@ spec:
           value: "true"
         - name: DD_ANALYTICS_ENABLED
           value: "true"
+        - name: DD_ENV
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/env']
+        - name: DD_SERVICE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/service']
+        - name: DD_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/version']
         # Enable RUM
         # - name: DD_CLIENT_TOKEN
         #   value: <your_client_token>
         # - name: DD_APPLICATION_ID
         #   value: <your_application_id>
-        image: ddtraining/ecommerce-frontend-broken:latest
+        image: ddtraining/ecommerce-frontend:latest
         imagePullPolicy: Always
         name: ecommerce-spree-observability
         ports:

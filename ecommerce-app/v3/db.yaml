@@ -48,6 +48,9 @@ metadata:
   labels:
     service: db
     app: ecommerce
+    tags.datadoghq.com/env: "ruby-shop"
+    tags.datadoghq.com/service: "postgres-service"
+    tags.datadoghq.com/version: "v3"
   name: db
 spec:
   replicas: 1
@@ -61,6 +64,9 @@ spec:
       labels:
         service: db
         app: ecommerce
+        tags.datadoghq.com/env: "ruby-shop"
+        tags.datadoghq.com/service: "postgres-service"
+        tags.datadoghq.com/version: "v3"
     spec:
       containers:
       - image: postgres:11-alpine
@@ -79,6 +85,18 @@ spec:
           value: "user"
         - name: PGDATA
           value: "/var/lib/postgresql/data/mydata"
+        - name: DD_ENV
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/env']
+        - name: DD_SERVICE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/service']
+        - name: DD_VERSION
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.labels['tags.datadoghq.com/version']
         resources: {}
         volumeMounts:
         - mountPath: /var/lib/postgresql/data
