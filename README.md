@@ -24,7 +24,7 @@ helm install datadog --set datadog.apiKey=$DD_API_KEY datadog/datadog -f datadog
 This will deploy the example Ecommerce application and will create an Ambassador Mapping for its frontend service:
 
 ```
-oc apply -f ecommerce-app
+oc apply -f ecommerce-app/v1
 ```
 
 ### Setting up Datadog-Ambassador integration
