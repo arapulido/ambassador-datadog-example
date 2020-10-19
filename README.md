@@ -16,7 +16,7 @@ This will deploy Datadog with APM and Logging enabled and with an Openshift SCC:
 
 ```
 export DD_API_KEY=<YOUR_DATADOG_API_KEY>
-helm install datadog --set datadog.apiKey=$DD_API_KEY datadog/datadog -f datadog-helm-values.yaml
+helm install datadog --set datadog.apiKey=$DD_API_KEY datadog/datadog -f datadog-helm-values.yaml --version="2.4.25"
 ```
 
 ### Deploying the Ecommerce app
