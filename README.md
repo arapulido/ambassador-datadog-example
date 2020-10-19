@@ -43,3 +43,16 @@ The Ambassador pod needs restarting for the Tracing object to take effect:
 oc scale deployment ambassador --replicas=0 -n ambassador
 oc scale deployment ambassador --replicas=1 -n ambassador
 ```
+
+## Replaying traffic
+
+[Go Replay](https://github.com/buger/goreplay) is an open-source network monitoring tool which can record your live traffic, and use it for shadowing, load testing, monitoring and detailed analysis.
+
+This repository has a Go Replay profile available that navigates around the application. To replay the traffic:
+
+* Download the latest release of Go Replay for your platform on [their releases page](https://github.com/buger/goreplay/releases).
+* Replay the traffic:
+
+```
+./gor --input-file-loop --input-file requests_0.gor --output-http "<AMBASSADOR_URL>"
+```
