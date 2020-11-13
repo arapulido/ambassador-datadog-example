@@ -89,8 +89,7 @@ spec:
   ports:
   - port: 3000
     protocol: TCP
-    nodePort: 30001
   selector:
     service: frontend
     app: ecommerce
-  type: NodePort
+  type: ClusterIP
