@@ -1,5 +1,5 @@
 # ambassador-datadog-example
-An example application that shows how ambassador and datadog work together in an Openshift environment
+An example application that shows how Ambassador and Datadog work together in an Kubernetes/Openshift environment
 
 ## Setup
 This assumes you have Helm 3 CLI installed in your system
@@ -7,24 +7,36 @@ This assumes you have Helm 3 CLI installed in your system
 ### Deploying Ambassador
 
 ```
-oc apply -f ambassador-deployment/
+kubectl apply -f ambassador-deployment/
 ```
 
 ### Deploying Datadog
 
-This will deploy Datadog with APM and Logging enabled and with an Openshift SCC:
+#### In Generic Kubernetes
+If you are deploying this in a generic Kubernetes cluster, use the following command:
 
 ```
 export DD_API_KEY=<YOUR_DATADOG_API_KEY>
-helm install datadog --set datadog.apiKey=$DD_API_KEY datadog/datadog -f datadog-helm-values.yaml --version="2.4.25"
+helm install datadog --set datadog.apiKey=$DD_API_KEY datadog/datadog -f datadog-generic-helm-values.yaml --version=2.8.1
 ```
+This will deploy Datadog with APM and Logging enabled.
+
+#### In Openshift
+
+If you are deploying this in Openshift, use the following command:
+
+```
+export DD_API_KEY=<YOUR_DATADOG_API_KEY>
+helm install datadog --set datadog.apiKey=$DD_API_KEY datadog/datadog -f datadog-openshift-helm-values.yaml --version=2.8.1
+```
+This will deploy Datadog with APM and Logging enabled and with an Openshift SCC.
 
 ### Deploying the Ecommerce app
 
 This will deploy the example Ecommerce application and will create an Ambassador Mapping for its frontend service:
 
 ```
-oc apply -f ecommerce-app/v1
+kubectl apply -f ecommerce-app/v1
 ```
 
 ### Setting up Datadog-Ambassador integration
@@ -32,7 +44,7 @@ oc apply -f ecommerce-app/v1
 This will enable JSON logging for Envoy and will enable Ambassador's Datadog integration to send traces to Datadog:
 
 ```
-oc apply -f ambassador-datadog
+kubectl apply -f ambassador-datadog
 ```
 
 ### Restarting the ambassador pod
@@ -40,8 +52,8 @@ oc apply -f ambassador-datadog
 The Ambassador pod needs restarting for the Tracing object to take effect:
 
 ```
-oc scale deployment ambassador --replicas=0 -n ambassador
-oc scale deployment ambassador --replicas=1 -n ambassador
+kubectl scale deployment ambassador --replicas=0 -n ambassador
+kubectl scale deployment ambassador --replicas=1 -n ambassador
 ```
 
 ## Replaying traffic
