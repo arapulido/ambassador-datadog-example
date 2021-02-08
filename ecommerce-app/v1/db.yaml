@@ -48,7 +48,7 @@ metadata:
   labels:
     service: db
     app: ecommerce
-    tags.datadoghq.com/env: "ruby-shop"
+    tags.datadoghq.com/env: "datadog-ambassador"
     tags.datadoghq.com/service: "postgres-service"
     tags.datadoghq.com/version: "v1"
   name: db
@@ -64,7 +64,7 @@ spec:
       labels:
         service: db
         app: ecommerce
-        tags.datadoghq.com/env: "ruby-shop"
+        tags.datadoghq.com/env: "datadog-ambassador"
         tags.datadoghq.com/service: "postgres-service"
         tags.datadoghq.com/version: "v1"
     spec:

@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    tags.datadoghq.com/env: "ruby-shop"
+    tags.datadoghq.com/env: "datadog-ambassador"
     tags.datadoghq.com/service: "advertisements-service"
     tags.datadoghq.com/version: "v1"
     service: advertisements
@@ -21,7 +21,7 @@ spec:
       labels:
         service: advertisements
         app: ecommerce
-        tags.datadoghq.com/env: "ruby-shop"
+        tags.datadoghq.com/env: "datadog-ambassador"
         tags.datadoghq.com/service: "advertisements-service"
         tags.datadoghq.com/version: "v1"
     spec:

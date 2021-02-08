@@ -4,7 +4,7 @@ metadata:
   labels:
     service: frontend
     app: ecommerce
-    tags.datadoghq.com/env: "ruby-shop"
+    tags.datadoghq.com/env: "datadog-ambassador"
     tags.datadoghq.com/service: "store-frontend"
     tags.datadoghq.com/version: "v2"
   name: frontend
@@ -24,7 +24,7 @@ spec:
       labels:
         service: frontend
         app: ecommerce
-        tags.datadoghq.com/env: "ruby-shop"
+        tags.datadoghq.com/env: "datadog-ambassador"
         tags.datadoghq.com/service: "store-frontend"
         tags.datadoghq.com/version: "v2"
     spec:

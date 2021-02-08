@@ -4,7 +4,7 @@ metadata:
   labels:
     app: ecommerce
     service: discounts
-    tags.datadoghq.com/env: "ruby-shop"
+    tags.datadoghq.com/env: "datadog-ambassador"
     tags.datadoghq.com/service: "discounts-service"
     tags.datadoghq.com/version: "v2"
   name: discounts
@@ -21,7 +21,7 @@ spec:
       labels:
         service: discounts
         app: ecommerce
-        tags.datadoghq.com/env: "ruby-shop"
+        tags.datadoghq.com/env: "datadog-ambassador"
         tags.datadoghq.com/service: "discounts-service"
         tags.datadoghq.com/version: "v2"
     spec:
