@@ -12,6 +12,13 @@ kubectl apply -f ambassador-deployment/
 
 ### Deploying Datadog
 
+First, you need to add this repository to your Helm repositories:
+
+```
+helm repo add datadog https://helm.datadoghq.com
+helm repo update
+```
+
 #### In Generic Kubernetes
 If you are deploying this in a generic Kubernetes cluster, use the following command:
 
