@@ -20,57 +20,6 @@ metadata:
   labels:
     product: aes
 
-
-# Edge Stack mostly needs the same permissions as Ambassador OSS,
-# but:
-#  1. It needs extra permissions ("update"/"patch"/"create"/"delete")
-#     for getambassador.io resources.
-#  2. It needs extra permissions ("create"/"update") for secrets.
-#  3. It needs permission to "create" events.
-#  4. It needs permission to "get"/"create"/"update" Leases (or
-#     Endpoints, if on Kubernetes <1.12).
-#
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRole
-metadata:
-  name: ambassador
-  labels:
-    product: aes
-rules:
-- apiGroups: [ "apiextensions.k8s.io" ]
-  resources: [ "customresourcedefinitions" ]
-  verbs: ["get", "list", "watch"]
-- apiGroups: [""]
-  resources: [ "namespaces", "services", "pods" ]
-  verbs: ["get", "list", "watch"]
-- apiGroups: [ "getambassador.io" ]
-  resources: [ "*" ]
-  verbs: ["get", "list", "watch", "update", "patch", "create", "delete" ]
-- apiGroups: [ "networking.internal.knative.dev" ]
-  resources: [ "clusteringresses", "ingresses" ]
-  verbs: ["get", "list", "watch"]
-- apiGroups: [ "networking.internal.knative.dev" ]
-  resources: [ "ingresses/status", "clusteringresses/status" ]
-  verbs: ["update"]
-- apiGroups: [ "extensions", "networking.k8s.io" ]
-  resources: [ "ingresses" ]
-  verbs: ["get", "list", "watch"]
-- apiGroups: [ "extensions", "networking.k8s.io" ]
-  resources: [ "ingresses/status" ]
-  verbs: ["update"]
-- apiGroups: [""]
-  resources: [ "secrets" ]
-  verbs: ["get", "list", "watch", "create", "update"]
-- apiGroups: [""]
-  resources: [ "events" ]
-  verbs: ["get", "list", "watch", "create"]
-- apiGroups: ["coordination.k8s.io"]
-  resources: [ "leases" ]
-  verbs: ["get", "create", "update"]
-- apiGroups: [""]
-  resources: [ "endpoints" ]
-  verbs: ["get", "list", "watch", "create", "update"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
@@ -127,6 +76,108 @@ subjects:
 - kind: ServiceAccount
   name: ambassador
   namespace: ambassador
+---
+# AES specific permissions. If a permission also applies to OSS, it should go in ambassador/docs/yaml/ambassador/ambassador-rbac.yaml
+# Edge Stack mostly needs the same permissions as Ambassador OSS,
+# but:
+#  1. It needs extra permissions ("update"/"patch"/"create"/"delete")
+#     for getambassador.io resources.
+#  2. It needs extra permissions ("create"/"update") for secrets.
+#  3. It needs permission to "create" events.
+#  4. It needs permission to "get"/"create"/"update" Leases (or
+#     Endpoints, if on Kubernetes <1.12).
+#
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: ambassador
+  labels:
+    product: aes
+rules:
+- apiGroups: [ "apiextensions.k8s.io" ]
+  resources: [ "customresourcedefinitions" ]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [ "getambassador.io" ]
+  resources: [ "*" ]
+  verbs: ["update", "patch", "create", "delete" ]
+- apiGroups: [""]
+  resources: [ "secrets" ]
+  verbs: ["create", "update"]
+- apiGroups: [""]
+  resources: [ "events" ]
+  verbs: ["get", "list", "watch", "create", "patch"]
+- apiGroups: ["coordination.k8s.io"]
+  resources: [ "leases" ]
+  verbs: ["get", "create", "update"]
+- apiGroups: [""]
+  resources: [ "endpoints" ]
+  verbs: ["get", "list", "watch", "create", "update"]
+- apiGroups:
+  - ''
+  resources:
+  - endpoints
+  - namespaces
+  - secrets
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - getambassador.io
+  resources:
+  - '*'
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - getambassador.io
+  resources:
+  - mappings/status
+  verbs:
+  - update
+- apiGroups:
+  - apiextensions.k8s.io
+  resources:
+  - customresourcedefinitions
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.internal.knative.dev
+  resources:
+  - clusteringresses
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.internal.knative.dev
+  resources:
+  - ingresses/status
+  - clusteringresses/status
+  verbs:
+  - update
+- apiGroups:
+  - extensions
+  - networking.k8s.io
+  resources:
+  - ingresses
+  - ingressclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  - networking.k8s.io
+  resources:
+  - ingresses/status
+  verbs:
+  - update
 
 ######################################################################
 # Redis
@@ -218,6 +269,24 @@ spec:
   prefix: /docs/
   rewrite: "/docs/"
   service: "127.0.0.1:8500"
+---
+# Set up a seperate mapping for the assets so we can inject caching headers to improve page load time
+apiVersion: getambassador.io/v2
+kind: Mapping
+metadata:
+  name: ambassador-devportal-assets
+  namespace: ambassador
+spec:
+  prefix: /documentation/(assets|styles)/(.*)(.css)
+  prefix_regex: true
+  regex_rewrite:
+    pattern: /documentation/(.*)
+    substitution: /docs/\1
+  service: "127.0.0.1:8500"
+  add_response_headers:
+    cache-control:
+      value: "public, max-age=3600, immutable"
+      append: false
 ---
 apiVersion: getambassador.io/v2
 kind: Mapping
@@ -312,10 +381,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        - name: HOST_IP 
+        - name: HOST_IP
           valueFrom:
             fieldRef:
-              fieldPath: status.hostIP 
+              fieldPath: status.hostIP
         - name: REDIS_URL
           value: ambassador-redis:6379
         - name: AMBASSADOR_URL
@@ -326,8 +395,15 @@ spec:
           value: https://127.0.0.1:8443
         - name: AMBASSADOR_SINGLE_NAMESPACE
           value: ''
-        image: docker.io/datawire/aes:1.7.2
+        - name: AMBASSADOR_KNATIVE_SUPPORT
+          value: 'true'
+        - name: AMBASSADOR_DRAIN_TIME
+          value: '600'
+        - name: AMBASSADOR_LEGACY_MODE
+          value: 'true'
+        image: docker.io/datawire/aes:1.11.0
         livenessProbe:
+          failureThreshold: 3
           httpGet:
             path: /ambassador/v0/check_alive
             port: 8877
@@ -341,6 +417,7 @@ spec:
         - containerPort: 8877
           name: admin
         readinessProbe:
+          failureThreshold: 3
           httpGet:
             path: /ambassador/v0/check_ready
             port: 8877
@@ -361,6 +438,8 @@ spec:
           name: ambassador-edge-stack-secrets
           readOnly: true
       restartPolicy: Always
+      securityContext:
+        runAsUser: 8888
       serviceAccountName: ambassador
       terminationGracePeriodSeconds: 0
       volumes:
@@ -373,3 +452,81 @@ spec:
       - name: ambassador-edge-stack-secrets
         secret:
           secretName: ambassador-edge-stack
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-app
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: sample-app
+  template:
+    metadata:
+      annotations:
+        consul.hashicorp.com/connect-inject: 'false'
+        sidecar.istio.io/inject: 'false'
+      labels:
+        service: sample-app
+    spec:
+      containers:
+        - name: sample-app
+          image: gcr.io/datawire/k8s-initializer-sample-app:latest
+          imagePullPolicy: Always
+          env:
+            - name: LISTEN_PORT
+              value: '3000'
+            
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10
+          ports:
+            - containerPort: 3000
+              name: http
+      restartPolicy: Always
+      securityContext:
+        runAsUser: 8888
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-app
+  namespace: default
+  labels:
+    service: sample-app
+spec:
+  ports:
+    - port: 80
+      name: http
+      targetPort: http
+  selector:
+    service: sample-app
+---
+apiVersion: getambassador.io/v2
+kind: Mapping
+metadata:
+  name: sample-app
+  namespace: default
+spec:
+  prefix: /
+  rewrite: /
+  service: sample-app:80
+---
+apiVersion: getambassador.io/v2
+kind: Mapping
+metadata:
+  name: sample-app-backend-route
+  namespace: default
+spec:
+  prefix: /backend/
+  rewrite: /
+  service: sample-app:80
