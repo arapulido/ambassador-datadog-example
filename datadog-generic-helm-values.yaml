@@ -396,7 +396,7 @@ datadog:
     ## This requires processAgent.enabled and clusterAgent.enabled to be set to true
     ## ref: TODO - add doc link
     #
-    enabled: false
+    enabled: enabled
 
     ## @param container_scrubbing - boolean - required
     ## Enable the scrubbing of containers in the kubernetes resource YAML for sensitive information.
@@ -456,7 +456,7 @@ clusterAgent:
   ## @param enabled - boolean - required
   ## Set this to true to enable Datadog Cluster Agent
   #
-  enabled: false
+  enabled: true
 
   ## @param image - object - required
   ## Define the Datadog Cluster-Agent image to work with.
